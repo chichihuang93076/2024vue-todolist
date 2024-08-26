@@ -73,7 +73,7 @@
             <h6 className="emptytext">目前尚無待辦事項</h6>
             <img
               className="emptypic"
-              src="https://github.com/hexschool/2022-web-layout-training/blob/main/todolist/empty%201.png"
+              src="https://raw.githubusercontent.com/hexschool/2022-web-layout-training/main/todolist/empty 1.png"
               alt="empty1"
             />
           </div>
@@ -116,7 +116,7 @@ onMounted(() => {
 const checkout = async () => {
   const tomorrow = new Date()
   tomorrow.setDate(tomorrow.getDate() + 1)
-  document.cookie = `hexschoolTodo=${tokenCheck.value}; expires=${tomorrow.toUTCString()}`
+  document.cookie = `hexschoolTodo=${token.value}; expires=${tomorrow.toUTCString()}`
 
   try {
     const response = await axios.get(`${api}/users/checkout`, {
