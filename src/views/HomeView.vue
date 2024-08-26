@@ -1,6 +1,7 @@
 <script setup>
 import axios from 'axios'
 import { ref } from 'vue'
+import SideView from './SideView.vue'
 
 const api = 'https://todolist-api.hexschool.io'
 
@@ -20,6 +21,7 @@ const signIn = async () => {
     // console.log(response.data)
     responseMessage.value = '登入成功'
     token.value = response.data.token
+    document.cookie = `todotoken=${response.data.token};`
   } catch (error) {
     //console.log(error.response.data)
     isErrorMessage.value = error.response.data.status
@@ -33,19 +35,7 @@ const signIn = async () => {
   <!-- login_page -->
   <div id="loginPage" class="bg-yellow">
     <div class="conatiner loginPage vhContainer">
-      <div class="side">
-        <a href="#"
-          ><img
-            class="logoImg"
-            src="https://raw.githubusercontent.com/hexschool/2022-web-layout-training/main/todolist/logo.png"
-            alt=""
-        /></a>
-        <img
-          class="d-m-n"
-          src="https://raw.githubusercontent.com/hexschool/2022-web-layout-training/main/todolist/img.png"
-          alt="workImg"
-        />
-      </div>
+      <SideView />
       <div>
         <form class="formControls" action="index.html">
           <h2 class="formControls_txt">最實用的線上代辦事項服務</h2>
@@ -73,7 +63,6 @@ const signIn = async () => {
           <input
             class="formControls_btnSubmit"
             type="button"
-            onclick="javascript:location.href='#todoListPage'"
             value="登入"
             @click.prevent="signIn"
           />
@@ -86,10 +75,10 @@ const signIn = async () => {
                 'text-success': !isErrorMessage
               }"
             >
-              {{ responseMessage }} {{ token }}
+              {{ responseMessage }}
             </p>
           </template>
-          <a class="formControls_btnLink" href="#signUpPage">註冊帳號</a>
+          <a class="formControls_btnLink" href="#signup">註冊帳號</a>
         </form>
       </div>
     </div>
