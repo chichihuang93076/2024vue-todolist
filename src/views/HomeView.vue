@@ -21,7 +21,8 @@ const signIn = async () => {
     // console.log(response.data)
     responseMessage.value = '登入成功'
     token.value = response.data.token
-    document.cookie = `todotoken=${response.data.token};`
+    //document.cookie = response.data.token
+    document.cookie = `hexschoolTodo=${response.data.token};`
   } catch (error) {
     //console.log(error.response.data)
     isErrorMessage.value = error.response.data.status
