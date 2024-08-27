@@ -20,7 +20,7 @@
             <i class="fa fa-plus"></i>
           </a>
         </div>
-        <div class="todoList_list">
+        <div class="todoList_list" v-if="todos.length > 0">
           <ul class="todoList_tab">
             <li>
               <a
@@ -47,9 +47,9 @@
               >
             </li>
           </ul>
-          <div class="todoList_items" v-if="todos.length > 0">
+          <div class="todoList_items">
             <ul class="todoList_item">
-              <li v-for="item in todos" :key="item.id">
+              <li v-for="item in todolist" :key="item.id">
                 <label class="todoList_label">
                   <input
                     class="todoList_input"
@@ -60,7 +60,7 @@
                   />
                   <span>{{ item.content }}</span>
                 </label>
-                <a href="#">
+                <a @click="handleTodobyid(item.id)">
                   <i class="fa fa-times"></i>
                 </a>
               </li>
@@ -69,14 +69,14 @@
               <p>5 個已完成項目</p>
             </div>
           </div>
-          <div className="emptyList" v-else>
-            <h6 className="emptytext">目前尚無待辦事項</h6>
-            <img
-              className="emptypic"
-              src="https://raw.githubusercontent.com/hexschool/2022-web-layout-training/main/todolist/empty 1.png"
-              alt="empty1"
-            />
-          </div>
+        </div>
+        <div className="emptyList" v-else>
+          <h6 className="emptytext">目前尚無待辦事項</h6>
+          <img
+            className="emptypic"
+            src="https://raw.githubusercontent.com/hexschool/2022-web-layout-training/main/todolist/empty 1.png"
+            alt="empty1"
+          />
         </div>
       </div>
     </div>
@@ -86,16 +86,21 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
+import { useRouter } from 'vue-router'
+
+// 初始化 Vue Router 來進行路由跳轉
+const router = useRouter()
 
 const api = 'https://todolist-api.hexschool.io'
 
 const newTodo = ref('')
 const token = ref('')
 const todos = ref([])
+const todolist = ref([])
 const tabStatus = ref('全部')
 const username = ref('')
 const cookieValue = ref('')
-const tokenCheck = ref('')
+//const tokenCheck = ref('')
 
 // 取得 Cookie
 cookieValue.value = document.cookie
@@ -130,6 +135,7 @@ const checkout = async () => {
     //messageCheckOut.value = '驗證成功 UID: ' + response.data.uid;
   } catch (error) {
     console.log('驗證失敗: ' + error.message)
+    router.push('/')
     //messageCheckOut.value = '驗證失敗: ' + error.message;
   }
 }
@@ -142,14 +148,14 @@ const signOut = async () => {
       {},
       {
         headers: {
-          Authorization: cookieValue
+          Authorization: cookieValue.value
         }
       }
     )
     if (res.data.status) {
       document.cookie = 'hexschoolTodo='
       username.value = ''
-      // navigate("/auth/login");
+      router.push('/')
     }
   } catch (error) {
     console.log('登出失敗')
@@ -157,9 +163,15 @@ const signOut = async () => {
   }
 }
 
+//處理tab切換
 const handleTabStatus = (tab) => {
   tabStatus.value = tab
-  console.log(tabStatus)
+  console.log(tabStatus.value)
+
+  todolist.value = todos.value?.filter((item) =>
+    tab === '待完成' ? !item.status : tab === '已完成' ? item.status : item
+  )
+  console.log(todolist.value)
 }
 
 //變更todo狀態
@@ -181,6 +193,7 @@ const toggleTodo = async (id) => {
   }
 }
 
+//新增todo
 const addTodo = async () => {
   try {
     const data = {
@@ -202,6 +215,28 @@ const addTodo = async () => {
   }
 }
 
+//刪除代辦事項by id
+const deleteTodo = async (id) => {
+  console.log(id)
+  try {
+    const res = await axios.delete(`${api}/todos/${id}`, {
+      headers: {
+        Authorization: token.value
+      }
+    })
+    console.log(res)
+  } catch (error) {
+    console.log(error.response.data.message)
+    //setMessage(error.mssage)
+  }
+}
+
+//刪除單一代辦事項
+const handleTodobyid = (id) => {
+  deleteTodo(id)
+  getTodos()
+}
+
 const getTodos = async () => {
   try {
     const response = await axios.get(`${api}/todos/`, {
@@ -210,6 +245,7 @@ const getTodos = async () => {
       }
     })
     todos.value = response.data.data
+    handleTabStatus(tabStatus.value)
   } catch (error) {
     console.error('資料取得發生錯誤:', error)
     alert('資料取得發生錯誤' + error.response.data.message)

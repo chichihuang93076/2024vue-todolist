@@ -2,6 +2,10 @@
 import axios from 'axios'
 import { ref } from 'vue'
 import SideView from './SideView.vue'
+import { useRouter } from 'vue-router'
+
+// 初始化 Vue Router 來進行路由跳轉
+const router = useRouter()
 
 const api = 'https://todolist-api.hexschool.io'
 
@@ -23,6 +27,7 @@ const signIn = async () => {
     token.value = response.data.token
     //document.cookie = response.data.token
     document.cookie = `hexschoolTodo=${response.data.token};`
+    router.push('/todo')
   } catch (error) {
     //console.log(error.response.data)
     isErrorMessage.value = error.response.data.status
@@ -38,7 +43,7 @@ const signIn = async () => {
     <div class="conatiner loginPage vhContainer">
       <SideView />
       <div>
-        <form class="formControls" action="index.html">
+        <form class="formControls">
           <h2 class="formControls_txt">最實用的線上代辦事項服務</h2>
           <label class="formControls_label" for="email">Email</label>
           <input
@@ -79,7 +84,9 @@ const signIn = async () => {
               {{ responseMessage }}
             </p>
           </template>
-          <a class="formControls_btnLink" href="#signup">註冊帳號</a>
+          <RouterLink to="/signup" class="formControls_btnLink link-underlined"
+            >註冊帳號</RouterLink
+          >
         </form>
       </div>
     </div>

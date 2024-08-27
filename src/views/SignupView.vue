@@ -50,7 +50,7 @@
             value="註冊帳號"
             @click.prevent="handleSignup"
           />{{ messageSignUp }}
-          <a class="formControls_btnLink" href="#">登入</a>
+          <RouterLink to="/" class="formControls_btnLink">登入</RouterLink>
         </form>
       </div>
     </div>
@@ -61,6 +61,10 @@
 import axios from 'axios'
 import { ref } from 'vue'
 import SideView from './SideView.vue'
+import { useRouter } from 'vue-router'
+
+// 初始化 Vue Router 來進行路由跳轉
+const router = useRouter()
 
 const api = 'https://todolist-api.hexschool.io'
 
@@ -88,6 +92,8 @@ const signUp = async () => {
     })
     messageSignUp.value = '註冊成功. UID: ' + response.data.uid
     isErrorSignUp.value = false
+
+    router.push('/')
   } catch (error) {
     messageSignUp.value = '註冊失敗: ' + error.response.data.message
     isErrorSignUp.value = true
