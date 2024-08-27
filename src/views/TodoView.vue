@@ -87,6 +87,7 @@
 import { ref, onMounted, computed } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
+import Swal from 'sweetalert2'
 
 // 初始化 Vue Router 來進行路由跳轉
 const router = useRouter()
@@ -206,11 +207,23 @@ const addTodo = async () => {
     })
     console.log('資料新增成功:', response.data)
     newTodo.value = ''
-    alert('資料新增成功')
+    Swal.fire({
+      icon: 'success',
+      title: '訊息',
+      text: '資料新增成功',
+      timer: 2000,
+      timerProgressBar: true
+    })
     getTodos()
   } catch (error) {
     console.error('新增資料時發生錯誤:', error)
-    alert('新增資料時發生錯誤' + error.response.data.message)
+    Swal.fire({
+      icon: 'error',
+      title: '訊息',
+      text: '新增資料時發生錯誤' + error.response.data.message,
+      timer: 2000,
+      timerProgressBar: true
+    })
   }
 }
 

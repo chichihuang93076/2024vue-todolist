@@ -3,6 +3,7 @@ import axios from 'axios'
 import { ref } from 'vue'
 import SideView from './SideView.vue'
 import { useRouter } from 'vue-router'
+import Swal from 'sweetalert2'
 
 // 初始化 Vue Router 來進行路由跳轉
 const router = useRouter()
@@ -25,16 +26,31 @@ const signIn = async () => {
     // console.log(response.data)
     responseMessage.value = '登入成功'
     token.value = response.data.token
-    //document.cookie = response.data.token
     const tomorrow = new Date()
     tomorrow.setDate(tomorrow.getDate() + 1)
     document.cookie = `hexschoolTodo=${response.data.token}; expires=${tomorrow.toUTCString()}`
+
+    Swal.fire({
+      icon: 'success',
+      title: '訊息',
+      text: responseMessage.value,
+      timer: 2000,
+      timerProgressBar: true
+    })
+
     router.push('/todo')
   } catch (error) {
     //console.log(error.response.data)
     isErrorMessage.value = error.response.data.status
     responseMessage.value = '登入失敗: ' + error.response.data.message
     token.value = ''
+    Swal.fire({
+      icon: 'warning',
+      title: '訊息',
+      text: responseMessage.value,
+      timer: 2000,
+      timerProgressBar: true
+    })
   }
 }
 </script>
@@ -82,9 +98,7 @@ const signIn = async () => {
                 'text-danger': isErrorMessage,
                 'text-success': !isErrorMessage
               }"
-            >
-              {{ responseMessage }}
-            </p>
+            ></p>
           </template>
           <RouterLink to="/signup" class="formControls_btnLink link-underlined"
             >註冊帳號</RouterLink

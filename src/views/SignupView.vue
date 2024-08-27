@@ -49,7 +49,7 @@
             type="button"
             value="註冊帳號"
             @click.prevent="handleSignup"
-          />{{ messageSignUp }}
+          />
           <RouterLink to="/" class="formControls_btnLink">登入</RouterLink>
         </form>
       </div>
@@ -62,6 +62,7 @@ import axios from 'axios'
 import { ref } from 'vue'
 import SideView from './SideView.vue'
 import { useRouter } from 'vue-router'
+import Swal from 'sweetalert2'
 
 // 初始化 Vue Router 來進行路由跳轉
 const router = useRouter()
@@ -79,7 +80,13 @@ const handleSignup = () => {
   if (passwordSignUp.value === repasswordSignUp.value) {
     signUp()
   } else {
-    messageSignUp.value = '密碼輸入不一致請再次確認'
+    Swal.fire({
+      icon: 'warning',
+      title: '訊息',
+      text: '密碼輸入不一致請再次確認',
+      timer: 2000,
+      timerProgressBar: true
+    })
   }
 }
 
@@ -92,11 +99,24 @@ const signUp = async () => {
     })
     messageSignUp.value = '註冊成功. UID: ' + response.data.uid
     isErrorSignUp.value = false
-
+    Swal.fire({
+      icon: 'success',
+      title: '訊息',
+      text: messageSignUp.value,
+      timer: 2000,
+      timerProgressBar: true
+    })
     router.push('/')
   } catch (error) {
     messageSignUp.value = '註冊失敗: ' + error.response.data.message
     isErrorSignUp.value = true
+    Swal.fire({
+      icon: 'error',
+      title: '訊息',
+      text: messageSignUp.value,
+      timer: 2000,
+      timerProgressBar: true
+    })
   }
 }
 </script>
