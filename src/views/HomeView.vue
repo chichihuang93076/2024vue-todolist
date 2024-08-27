@@ -26,7 +26,9 @@ const signIn = async () => {
     responseMessage.value = '登入成功'
     token.value = response.data.token
     //document.cookie = response.data.token
-    document.cookie = `hexschoolTodo=${response.data.token};`
+    const tomorrow = new Date()
+    tomorrow.setDate(tomorrow.getDate() + 1)
+    document.cookie = `hexschoolTodo=${response.data.token}; expires=${tomorrow.toUTCString()}`
     router.push('/todo')
   } catch (error) {
     //console.log(error.response.data)

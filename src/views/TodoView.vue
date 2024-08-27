@@ -66,7 +66,7 @@
               </li>
             </ul>
             <div class="todoList_statistics">
-              <p>5 個已完成項目</p>
+              <p>{{ uncompleteCount }} 個未完成項目</p>
             </div>
           </div>
         </div>
@@ -84,7 +84,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
 
@@ -100,7 +100,6 @@ const todolist = ref([])
 const tabStatus = ref('全部')
 const username = ref('')
 const cookieValue = ref('')
-//const tokenCheck = ref('')
 
 // 取得 Cookie
 cookieValue.value = document.cookie
@@ -251,4 +250,9 @@ const getTodos = async () => {
     alert('資料取得發生錯誤' + error.response.data.message)
   }
 }
+
+//未完成項目
+const uncompleteCount = computed(() => {
+  return todos.value.filter((item) => !item.status).length
+})
 </script>
