@@ -137,7 +137,7 @@ const checkout = async () => {
     //messageCheckOut.value = '驗證成功 UID: ' + response.data.uid;
   } catch (error) {
     console.log('驗證失敗: ' + error.message)
-    router.push('/')
+    router.push('/signin')
     //messageCheckOut.value = '驗證失敗: ' + error.message;
   }
 }

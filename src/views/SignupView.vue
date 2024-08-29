@@ -50,7 +50,7 @@
             value="註冊帳號"
             @click.prevent="handleSignup"
           />
-          <RouterLink to="/" class="formControls_btnLink">登入</RouterLink>
+          <RouterLink to="/signin" class="formControls_btnLink">登入</RouterLink>
         </form>
       </div>
     </div>
