@@ -15,7 +15,21 @@ const passwordSignIn = ref('')
 
 const responseMessage = ref('')
 const isErrorMessage = ref(false)
-const token = ref('')
+let token = ''
+
+const handleSignin = () => {
+  if (emailSignIn.value.trim() && passwordSignIn.value.trim()) {
+    signIn()
+  } else {
+    Swal.fire({
+      icon: 'warning',
+      title: '訊息',
+      text: 'EMail或密碼空白請輸入',
+      timer: 5000,
+      timerProgressBar: true
+    })
+  }
+}
 
 const signIn = async () => {
   try {
@@ -25,10 +39,10 @@ const signIn = async () => {
     })
     // console.log(response.data)
     responseMessage.value = '登入成功'
-    token.value = response.data.token
+    token = response.data.token
     const tomorrow = new Date()
     tomorrow.setDate(tomorrow.getDate() + 1)
-    document.cookie = `hexschoolTodo=${response.data.token}; expires=${tomorrow.toUTCString()}`
+    document.cookie = `hexschoolTodo=${token}; expires=${tomorrow.toUTCString()}`
 
     Swal.fire({
       icon: 'success',
@@ -43,7 +57,7 @@ const signIn = async () => {
     //console.log(error.response.data)
     isErrorMessage.value = error.response.data.status
     responseMessage.value = '登入失敗: ' + error.response.data.message
-    token.value = ''
+    token = ''
     Swal.fire({
       icon: 'warning',
       title: '訊息',
@@ -88,7 +102,7 @@ const signIn = async () => {
             class="formControls_btnSubmit"
             type="button"
             value="登入"
-            @click.prevent="signIn"
+            @click.prevent="handleSignin"
           />
           <template v-if="responseMessage">
             <p

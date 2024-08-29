@@ -77,13 +77,17 @@ const messageSignUp = ref('')
 const isErrorSignUp = ref(false)
 
 const handleSignup = () => {
-  if (passwordSignUp.value === repasswordSignUp.value) {
+  if (
+    passwordSignUp.value === repasswordSignUp.value &&
+    emailSignUp.value.trim() &&
+    nickname.value.trim()
+  ) {
     signUp()
   } else {
     Swal.fire({
       icon: 'warning',
       title: '訊息',
-      text: '密碼輸入不一致請再次確認',
+      text: 'EMail空白、暱稱空白或密碼輸入不一致請再次確認',
       timer: 2000,
       timerProgressBar: true
     })

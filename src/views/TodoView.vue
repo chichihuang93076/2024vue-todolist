@@ -49,7 +49,7 @@
           </ul>
           <div class="todoList_items">
             <ul class="todoList_item">
-              <li v-for="item in todolist" :key="item.id">
+              <li v-for="item in filteredTodos" :key="item.id">
                 <label class="todoList_label">
                   <input
                     class="todoList_input"
@@ -87,7 +87,7 @@
 import { ref, onMounted, computed } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
-import Swal from 'sweetalert2'
+import showAlert from '../components/showAlert.js'
 
 // 初始化 Vue Router 來進行路由跳轉
 const router = useRouter()
@@ -95,12 +95,12 @@ const router = useRouter()
 const api = 'https://todolist-api.hexschool.io'
 
 const newTodo = ref('')
-const token = ref('')
 const todos = ref([])
-const todolist = ref([])
+//const todolist = ref([])
 const tabStatus = ref('全部')
 const username = ref('')
 const cookieValue = ref('')
+let token = ''
 
 // 取得 Cookie
 cookieValue.value = document.cookie
@@ -109,8 +109,10 @@ cookieValue.value = document.cookie
   ?.split('=')[1]
 // 預設 axios 的表頭
 if (cookieValue.value) {
-  token.value = cookieValue.value
+  token = cookieValue.value
 }
+// 預設 axios 的表頭
+axios.defaults.headers.common['Authorization'] = cookieValue
 
 onMounted(() => {
   checkout()
@@ -121,12 +123,12 @@ onMounted(() => {
 const checkout = async () => {
   const tomorrow = new Date()
   tomorrow.setDate(tomorrow.getDate() + 1)
-  document.cookie = `hexschoolTodo=${token.value}; expires=${tomorrow.toUTCString()}`
+  document.cookie = `hexschoolTodo=${token}; expires=${tomorrow.toUTCString()}`
 
   try {
     const response = await axios.get(`${api}/users/checkout`, {
       headers: {
-        Authorization: cookieValue.value
+        Authorization: token
       }
     })
     username.value = response.data.nickname
@@ -166,13 +168,17 @@ const signOut = async () => {
 //處理tab切換
 const handleTabStatus = (tab) => {
   tabStatus.value = tab
-  console.log(tabStatus.value)
 
-  todolist.value = todos.value?.filter((item) =>
-    tab === '待完成' ? !item.status : tab === '已完成' ? item.status : item
-  )
-  console.log(todolist.value)
+  // todolist.value = todos.value?.filter((item) =>
+  //   tab === '待完成' ? !item.status : tab === '已完成' ? item.status : item
+  // )
 }
+
+const filteredTodos = computed(() => {
+  return todos.value?.filter((item) =>
+    tabStatus.value === '待完成' ? !item.status : tabStatus.value === '已完成' ? item.status : item
+  )
+})
 
 //變更todo狀態
 const toggleTodo = async (id) => {
@@ -182,7 +188,7 @@ const toggleTodo = async (id) => {
       {},
       {
         headers: {
-          Authorization: token.value
+          Authorization: token
         }
       }
     )
@@ -195,51 +201,41 @@ const toggleTodo = async (id) => {
 
 //新增todo
 const addTodo = async () => {
+  //空白檢查
+  if (!newTodo.value.trim() || !token) return
+
   try {
     const data = {
       content: newTodo.value
     }
 
-    const response = axios.post(`${api}/todos/`, data, {
+    await axios.post(`${api}/todos/`, data, {
       headers: {
-        Authorization: token.value
+        Authorization: token
       }
     })
-    console.log('資料新增成功:', response.data)
+    //console.log('資料新增成功:', response.data)
     newTodo.value = ''
-    Swal.fire({
-      icon: 'success',
-      title: '訊息',
-      text: '資料新增成功',
-      timer: 2000,
-      timerProgressBar: true
-    })
+    showAlert('success', '訊息', '資料新增成功', 2000, true)
     getTodos()
   } catch (error) {
-    console.error('新增資料時發生錯誤:', error)
-    Swal.fire({
-      icon: 'error',
-      title: '訊息',
-      text: '新增資料時發生錯誤' + error.response.data.message,
-      timer: 2000,
-      timerProgressBar: true
-    })
+    //console.error('新增資料時發生錯誤:', error)
+    showAlert('error', '訊息', '新增資料時發生錯誤', 2000, true)
   }
 }
 
 //刪除代辦事項by id
 const deleteTodo = async (id) => {
-  console.log(id)
   try {
-    const res = await axios.delete(`${api}/todos/${id}`, {
+    await axios.delete(`${api}/todos/${id}`, {
       headers: {
-        Authorization: token.value
+        Authorization: token
       }
     })
-    console.log(res)
+    //console.log(res)
   } catch (error) {
-    console.log(error.response.data.message)
-    //setMessage(error.mssage)
+    //console.log(error.response.data.message)
+    showAlert('error', '訊息', '刪除資料時發生錯誤' + error.response.data.message, 5000, true)
   }
 }
 
@@ -253,14 +249,14 @@ const getTodos = async () => {
   try {
     const response = await axios.get(`${api}/todos/`, {
       headers: {
-        Authorization: token.value
+        Authorization: token
       }
     })
     todos.value = response.data.data
     handleTabStatus(tabStatus.value)
   } catch (error) {
-    console.error('資料取得發生錯誤:', error)
-    alert('資料取得發生錯誤' + error.response.data.message)
+    //console.error('資料取得發生錯誤:', error)
+    showAlert('error', '訊息', '資料取得發生錯誤' + error.response.data.message, 5000, true)
   }
 }
 
